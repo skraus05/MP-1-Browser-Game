@@ -8,8 +8,11 @@ invader destruction
 score
 */
 
+let scoring = document.querySelector('#score')
 let canvas = document.querySelector('canvas') //setting up project canvas
-let context = canvas.getContext('2d') //setting up project canvas
+let context = canvas.getContext('2d')
+
+//setting up project canvas
 
 class userPlayer { //creating user player
     constructor() {
@@ -22,8 +25,8 @@ class userPlayer { //creating user player
         image.src = './assets/dddd.png'
         image.onload = () => {
             this.image = image
-            this.width = image.width * 0.20;
-            this.height = image.height * 0.20;
+            this.width = image.width * 0.10;
+            this.height = image.height * 0.10;
             this.position = {
                 x: canvas.width / 2 - this.width / 2,
                 y: canvas.height - this.height - 30
@@ -35,7 +38,6 @@ class userPlayer { //creating user player
         //context.fillStyle = 'green'
         //context.fillRect(this.position.x, this.position.y, this.width, this.height)
         context.save()
-        context.globalAlpha = this.opacity
         context.globalAlpha = this.opacity
         context.drawImage(this.image, this.position.x, this.position.y, this.width, this.height)
         context.restore()
@@ -106,7 +108,7 @@ class enemyBullet {
         this.position = position
         this.velocity = velocity
         this.width = 3
-        this.height = 10
+        this.height = 5
     }
 
     draw() {
@@ -173,7 +175,7 @@ class Grid {
     constructor() {
         this.position = {
             x: 0,
-            y: 0
+            y: 0    
         }
 
         this.velocity = {
@@ -229,8 +231,10 @@ let sections = 0
 let numbers = Math.floor(Math.random() * 500) + 500
 let game = {
     over: false,
-    active: false
+    active: true
 }
+ let score = 0
+
 
 function explosion({object, color, fades}) {
     for (let i = 0; i < 15; i++) {
@@ -253,6 +257,7 @@ function explosion({object, color, fades}) {
 }
 
 function animate() {
+    if (!game.active) return
     requestAnimationFrame(animate)
     context.fillStyle = 'black'
     context.fillRect(0, 0, canvas.width, canvas.height)
@@ -267,28 +272,28 @@ function animate() {
             boom.update()
         }
     })
-    enemyBullets.forEach(enemyBullet => {
+    enemyBullets.forEach((enemyBullet, index) => {
         enemyBullet.update()
-        if (enemyBullet.position.y + enemyBullet.height >= player.position.y &&
-            enemyBullet.position.x + enemyBullet.width >= player.position.x &&
-            enemyBullet.position.x <= player.position.x + player.width) {
-                console.log('Game Over')
-                setTimeout(() => {
-                    enemyBullets.splice(index, 1)
-                    player.opacity = 0
-                    game.over = true
-                }, 0)
-                setTimeout(() => {
-                    game.active = false
-                }, 1500)
-                explosion({
-                    object: player,
-                    color: 'white',
-                    fades: true
-                })
+    if (player.opacity > 0 &&
+        enemyBullet.position.y + enemyBullet.height >= player.position.y &&
+        enemyBullet.position.x + enemyBullet.width >= player.position.x &&
+        enemyBullet.position.x <= player.position.x + player.width) {
+        setTimeout(() => {
+        enemyBullets.splice(index, 1)
+        player.opacity = 0;
+        game.over = true;
+        }, 0)
+        setTimeout(() => {
+        game.active = false;
+        }, 1200)
+        explosion({
+            object: player,
+            color: 'white',
+            fades: true
+        });
+    }
+});
 
-        }
-    })
     bullets.forEach(bullet => {
         bullet.update()
     })
@@ -308,7 +313,8 @@ function animate() {
                     bullet.position.x - bullet.radius <= Enemy.position.x + Enemy.width &&
                     bullet.position.y + bullet.radius >= Enemy.position.y
                 ) {
-                
+                    score += 100
+                    scoring.innerHTML = score
                     explosion({
                         object: Enemy,
                         fades: true
