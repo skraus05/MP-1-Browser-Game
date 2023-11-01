@@ -45,14 +45,14 @@ class userPlayer { //creating user player
 
     update() {
         if (this.image) {
-        this.draw()
-        this.position.x += this.velocity.x
+            this.draw()
+            this.position.x += this.velocity.x
         }
     }
 }
 
 class Bullet {
-    constructor({position, velocity}){
+    constructor({ position, velocity }) {
         this.position = position
         this.velocity = velocity
         this.radius = 3
@@ -74,7 +74,7 @@ class Bullet {
 }
 
 class Boom {
-    constructor({position, velocity, radius, color, fades}){
+    constructor({ position, velocity, radius, color, fades }) {
         this.position = position
         this.velocity = velocity
         this.radius = radius
@@ -99,12 +99,12 @@ class Boom {
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
         if (this.fades)
-        this.opacity -= 0.01
+            this.opacity -= 0.01
     }
 }
 
 class enemyBullet {
-    constructor({position, velocity}){
+    constructor({ position, velocity }) {
         this.position = position
         this.velocity = velocity
         this.width = 3
@@ -124,7 +124,7 @@ class enemyBullet {
 }
 
 class Enemy { //creating space invaders
-    constructor({position}) {
+    constructor({ position }) {
         this.velocity = {
             x: 0,
             y: 0
@@ -149,19 +149,19 @@ class Enemy { //creating space invaders
         context.drawImage(this.image, this.position.x, this.position.y, this.width, this.height)
     }
 
-    update({velocity}) {
+    update({ velocity }) {
         if (this.image) {
-        this.draw()
-        this.position.x += velocity.x
-        this.position.y += velocity.y
+            this.draw()
+            this.position.x += velocity.x
+            this.position.y += velocity.y
         }
     }
 
     fire(enemyBullets) {
         enemyBullets.push(new enemyBullet({
             position: {
-                x: this.position.x +this.width / 2,
-                y: this.position.y +this.height
+                x: this.position.x + this.width / 2,
+                y: this.position.y + this.height
             },
             velocity: {
                 x: 0,
@@ -175,11 +175,11 @@ class Grid {
     constructor() {
         this.position = {
             x: 0,
-            y: 0    
+            y: 0
         }
 
         this.velocity = {
-            x: 2.5   ,
+            x: 2.5,
             y: 0
         }
 
@@ -189,21 +189,23 @@ class Grid {
         this.width = columns * 82
         for (let i = 0; i < columns; i++) {
             for (let y = 0; y < rows; y++) {
-            this.enemies.push(new Enemy({position: {
-                x: i * 82,
-                y: y * 82
-            }}))
+                this.enemies.push(new Enemy({
+                    position: {
+                        x: i * 82,
+                        y: y * 82
+                    }
+                }))
+            }
         }
     }
-}
 
-    update(){
+    update() {
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
 
         this.velocity.y = 0
 
-        if (this.position.x +this.width >= canvas.width || this.position.x <= 0) {
+        if (this.position.x + this.width >= canvas.width || this.position.x <= 0) {
             this.velocity.x = -this.velocity.x
             this.velocity.y = 82
         }
@@ -233,10 +235,10 @@ let game = {
     over: false,
     active: true
 }
- let score = 0
+let score = 0
 
 
-function explosion({object, color, fades}) {
+function explosion({ object, color, fades }) {
     for (let i = 0; i < 15; i++) {
         booms.push(
             new Boom({
@@ -274,25 +276,32 @@ function animate() {
     })
     enemyBullets.forEach((enemyBullet, index) => {
         enemyBullet.update()
-    if (player.opacity > 0 &&
-        enemyBullet.position.y + enemyBullet.height >= player.position.y &&
-        enemyBullet.position.x + enemyBullet.width >= player.position.x &&
-        enemyBullet.position.x <= player.position.x + player.width) {
-        setTimeout(() => {
-        enemyBullets.splice(index, 1)
-        player.opacity = 0;
-        game.over = true;
-        }, 0)
-        setTimeout(() => {
-        game.active = false;
-        }, 1200)
-        explosion({
-            object: player,
-            color: 'white',
-            fades: true
-        });
-    }
-});
+        if (player.opacity > 0 &&
+            enemyBullet.position.y + enemyBullet.height >= player.position.y &&
+            enemyBullet.position.x + enemyBullet.width >= player.position.x &&
+            enemyBullet.position.x <= player.position.x + player.width) {
+            console.log('enemyBullet')
+            setTimeout(() => {
+                enemyBullets.splice(index, 1)
+                player.opacity = 0;
+                game.over = true;
+            }, 0)
+            setTimeout(() => {
+                game.active = false;
+            }, 1200)
+            explosion({
+                object: player,
+                color: 'white',
+                fades: true
+            });
+        }
+        if (enemyBullet.position.y + enemyBullet.height >= canvas.height) {
+            setTimeout (() => {
+                enemyBullets.splice(index, 1)
+            }, 0)
+        } else enemyBullet.update()
+        // if enemy bullet reaches botton of screen without contacting anything, remove bullet
+    });
 
     bullets.forEach(bullet => {
         bullet.update()
@@ -305,7 +314,7 @@ function animate() {
         }
         grid.enemies.forEach((Enemy, z) => {
             Enemy.update({ velocity: grid.velocity });
-    
+
             bullets.forEach((bullet, b) => {
                 if (
                     bullet.position.y - bullet.radius <= Enemy.position.y + Enemy.height &&
@@ -321,7 +330,7 @@ function animate() {
                     })
                     grid.enemies.splice(z, 1);
                     bullets.splice(b, 1);
-
+                    console.log(grid.enemies)
                     if (grid.enemies.length > 0) {
                         let firstEnemy = grid.enemies[0]
                         let lastEnemy = grid.enemies[grid.enemies.length - 1]
@@ -338,7 +347,7 @@ function animate() {
 
     if (buttons.ArrowLeft.pressed && player.position.x >= 0) {
         player.velocity.x = -7
-    } else if (buttons.ArrowRight.pressed && player.position.x +player.width <= canvas.width) {
+    } else if (buttons.ArrowRight.pressed && player.position.x + player.width <= canvas.width) {
         player.velocity.x = 7
     } else {
         player.velocity.x = 0
@@ -347,14 +356,14 @@ function animate() {
     if (sections % numbers === 0) {
         grids.push(new Grid())
         numbers = Math.floor(Math.random() * 500) + 500
-        sections = 0   
+        sections = 0
     }
 
     sections++
 }
 animate()
 
-addEventListener('keydown', ({key}) => {
+addEventListener('keydown', ({ key }) => {
     if (game.over) return
     switch (key) {
         case 'ArrowLeft':
@@ -371,27 +380,27 @@ addEventListener('keydown', ({key}) => {
                 position: {
                     x: player.position.x + player.width / 2,
                     y: player.position.y
-                } ,
+                },
                 velocity: {
-                    x:0,
+                    x: 0,
                     y: -7
                 }
-            }))   
-            break 
+            }))
+            break
     }
 })
 
-addEventListener('keyup', ({key}) => {
+addEventListener('keyup', ({ key }) => {
     switch (key) {
         case 'ArrowLeft':
-            console.log('left')
+            //console.log('left')
             buttons.ArrowLeft.pressed = false
             break
         case 'ArrowRight':
-            console.log('right')
+            //console.log('right')
             buttons.ArrowRight.pressed = false
             break
         case ' ':
-            console.log('space')    
+        //console.log('space')    
     }
 })
