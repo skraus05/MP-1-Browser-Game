@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "Space Invaders Game",
+            "database": "space_invaders",
+            "username": "postgres",
+            "password": "Baseball1027!",
+            "connectionTimeout": 30
+        }
+    ]
+}
